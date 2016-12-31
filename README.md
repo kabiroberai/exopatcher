@@ -19,7 +19,7 @@ Patches `in.ipa` in place.
 
 ### `./exopatcher in.ipa out.ipa`
 
-Patches `in.ipa` and saves the patched file at `out.ipa`.
+Patches `in.ipa` and saves the patched file as `out.ipa`.
 
 ### `./exopatcher < -h | --help >`
 
