@@ -23,7 +23,6 @@ if [[ -z $ipa ]]; then
 elif [[ ! -r $ipa ]]; then
 	error "$ipa: No such file or directory"
 fi
-dest="${2:-$ipa}"
 
 log 1 "Unpacking $(basename "$ipa")"
 optool="$(cd "$(dirname "$0")" && pwd)/optool"
@@ -49,5 +48,4 @@ rm -f "$exo_loader"
 
 log 4 "Repacking $app"
 (cd "$TMPDIR"; zip -9qry "app.ipa" "Payload")
-mv "$TMPDIR/app.ipa" "$dest"
-open -R "$dest"
+mv "$TMPDIR/app.ipa" "${2:-$ipa}"
