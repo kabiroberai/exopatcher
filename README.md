@@ -6,6 +6,7 @@ A tool to make Extensify ipa files sideload-able
 
 1. Click **Clone or download** > Download ZIP (or click [here](https://github.com/kabiroberai/exoloader/archive/master.zip))
 2. `cd` into the downloaded directory, and follow the instructions in [Usage](#usage)
+3. Re-sign the patched ipa using [iOS App Signer](https://dantheman827.github.io/ios-app-signer/)
 
 ## Usage
 
