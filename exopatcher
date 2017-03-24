@@ -24,13 +24,21 @@ elif [[ ! -r $ipa ]]; then
 	error "$ipa: No such file or directory"
 fi
 
+tmp=$(mktemp -d)
+function cleanup {
+	echo ""
+	log 5 "Cleaning up"
+	rm -rf "$tmp"
+}
+trap cleanup EXIT
+
 log 1 "Unpacking $(basename "$ipa")"
 optool="$(cd "$(dirname "$0")" && pwd)/optool"
-rm -rf "$TMPDIR/Payload"
-unzip -oq "$ipa" "Payload/*" -d "$TMPDIR"
+rm -rf "$tmp/Payload"
+unzip -oq "$ipa" "Payload/*" -d "$tmp"
 
-app=$(basename "$TMPDIR"/Payload/*.app)
-appdir="$TMPDIR/Payload/$app"
+app=$(basename "$tmp"/Payload/*.app)
+appdir="$tmp/Payload/$app"
 binary="$appdir/$(/usr/libexec/PlistBuddy -c "Print :CFBundleExecutable" "$appdir/Info.plist")"
 exo_loader="$appdir/ExoLoader.dylib"
 if [[ ! -r $exo_loader ]]; then
@@ -39,13 +47,13 @@ fi
 
 otool -L "$exo_loader" | grep -o "@executable_path/.*\.dylib" | sort -u | while read -r payload; do
 	log 2 "Injecting $(basename "$payload")"
-	$optool install -c load -p "$payload" -t "$binary" > /dev/null
+	"$optool" install -c load -p "$payload" -t "$binary" > /dev/null
 done
 
 log 3 "Uninstalling ExoLoader.dylib"
-$optool uninstall -p "@executable_path/ExoLoader.dylib" -t "$binary" > /dev/null
+"$optool" uninstall -p "@executable_path/ExoLoader.dylib" -t "$binary" > /dev/null
 rm -f "$exo_loader"
 
 log 4 "Repacking $app"
-(cd "$TMPDIR"; zip -9qry "app.ipa" "Payload")
-mv "$TMPDIR/app.ipa" "${2:-$ipa}"
+(cd "$tmp"; zip -9qry "app.ipa" "Payload")
+mv "$tmp/app.ipa" "${2:-$ipa}"
